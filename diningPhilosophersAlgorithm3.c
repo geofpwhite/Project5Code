@@ -16,7 +16,6 @@ int thinktime = 0;
 Zem_t seatsAreAvailable;
 // int seatsAreAvailable = 1;
 
-int curseats = 0;
 void think() { sleep(thinktime); }
 
 void getForks(int id) {

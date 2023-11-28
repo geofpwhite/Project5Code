@@ -15,20 +15,24 @@ int thinktime = 0;
 Zem_t mutex;
 void think() { sleep(thinktime); }
 
-void getForks(int id){
-  
-  Zem_wait(&mutex);
+void getForks(int id) {
+
+  if (id == 0 || id == 1) {
+    Zem_wait(&mutex);
+  }
   Zem_wait(&forks[id]);
   Zem_wait(&forks[(id + 1) % size]);
-  Zem_post(&mutex);
+  if (id == 0 || id == 1) {
+    Zem_post(&mutex);
+  }
 }
 
-void eat() {  }
+void eat() { sleep(1); }
 
 void giveUpForks(int id) {
   Zem_post(&forks[id]);
   Zem_post(&forks[(id + 1) % size]);
-  printf("\n%d",id);
+  printf("\n%d", id);
 }
 
 void *philosopher(void *arg) {
@@ -42,7 +46,6 @@ void *philosopher(void *arg) {
     giveUpForks(id);
   }
 
-
   return NULL;
 }
 
@@ -51,7 +54,7 @@ int main(int argc, char *argv[]) {
   thinktime = atoi(argv[2]);
   forks = malloc(sizeof(Zem_t) * size);
   int i;
-  Zem_init(&mutex,1);
+  Zem_init(&mutex, 1);
   for (i = 0; i < size; ++i) {
     Zem_init(&(forks[i]), 1);
     printf("zemaphore %d %p\n", i, &(forks[i]));
@@ -63,8 +66,8 @@ int main(int argc, char *argv[]) {
     long long int me = i;
     Pthread_create(&c, NULL, philosopher, (void *)me);
   }
-  i=0;
-  while(1){
+  i = 0;
+  while (1) {
     sleep(1);
   }
   printf("parent: finished \n");
